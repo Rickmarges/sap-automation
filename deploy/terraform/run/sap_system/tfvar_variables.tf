@@ -1171,7 +1171,7 @@ variable "register_storage_accounts_keyvaults_with_dns" {
 
 #########################################################################################
 #                                                                                       #
-#  NFS and Shared Filed settings                                                        #
+#  NFS and Shared Files settings                                                        #
 #                                                                                       #
 #########################################################################################
 
@@ -1491,6 +1491,11 @@ variable "patch_mode"                           {
 variable "patch_assessment_mode"                {
                                                   description = "If defined, define the patch mode for the virtual machines"
                                                   default     = "ImageDefault"
+                                                }
+
+variable "platform_updates"                {
+                                                  description = "Specifies whether VMAgent Platform Updates is enabled"
+                                                  default     = "true"
                                                 }
 
 #########################################################################################
