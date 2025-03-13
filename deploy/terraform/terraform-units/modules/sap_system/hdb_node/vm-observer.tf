@@ -68,7 +68,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   admin_password                        = local.enable_auth_key ? null : var.sid_password
   disable_password_authentication       = !local.enable_auth_password
 
-  zone                                 = local.zonal_deployment ? try(setsubtract(["1", "2", "3"], local.zones)[0],local.zones[0]) : null
+  zone                                 = local.zonal_deployment ? coalesce(var.observer_vm_zone, try(setsubtract(["1", "2", "3"], local.zones)[0],local.zones[0])) : null
 
   network_interface_ids                = [
                                            azurerm_network_interface.observer[count.index].id

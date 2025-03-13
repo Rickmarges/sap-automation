@@ -644,11 +644,14 @@ variable "use_observer"                         {
                                                   description = "If true, an observer virtual machine will be used"
                                                   default     = true
                                                 }
-variable "observer_vm_size"                        {
+variable "observer_vm_size"                     {
                                                   description = "The VM size to use for the observer"
                                                   default     = "Standard_D4s_v3"
                                                 }
-
+variable "observer_vm_zone"                     {
+                                                  description = "The zone to deploy the observer in"
+                                                  default     = 1
+                                                }
 
 variable "observer_nic_ips"                     {
                                                   description = "If provided, the database tier observer virtual machines will be configured with the specified IPs (db subnet)"
