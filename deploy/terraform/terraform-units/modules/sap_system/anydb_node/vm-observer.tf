@@ -82,7 +82,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   # ToDo Add back later
 # patch_mode                           = var.infrastructure.patch_mode
 
-  tags                                 = merge(local.tags, var.tags)
+  tags                                 = try(var.observer_vm_tags, merge(local.tags, var.tags))
 
   dynamic "admin_ssh_key" {
                             for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
