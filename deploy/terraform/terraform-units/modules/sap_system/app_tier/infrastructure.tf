@@ -327,7 +327,8 @@ resource "azurerm_availability_set" "scs" {
 #######################################4#######################################8
 resource "azurerm_availability_set" "app" {
   provider                             = azurerm.main
-  count                                = local.use_app_avset && var.application_tier.avset_arm_ids_count == 0 ? max(var.application_tier.app_zone_count, 1) : 0
+  # TODO: investigate the count. In a previous version (when this was based on PPG) we got 2, but in the new version we only get 1
+  count                                = local.use_app_avset && var.application_tier.avset_arm_ids_count == 0 ? max(length(var.ppg), 1) : 0
 
   depends_on                           = [azurerm_virtual_machine_data_disk_attachment.scs]
   name                                 = format("%s%s%s",
