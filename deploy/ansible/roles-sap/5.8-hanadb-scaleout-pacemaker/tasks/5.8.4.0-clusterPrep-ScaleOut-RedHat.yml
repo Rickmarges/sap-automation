@@ -161,7 +161,7 @@
 
         - name:                        "5.8 HANA Pacemaker Scaleout - Create constraints for pacemaker attribute resource on {{ primary_instance_name }}"
           ansible.builtin.shell: >
-                                       pcs constraint order fs_hana_shared_s1-clone then hana_nfs_s1_active-clone
+                                       pcs constraint order {{ item.fs_clone }} then {{ item.res_clone }}
           register:                    loc_attribute_hana_nfs_sites
           failed_when:                 false
           ignore_errors:               true
