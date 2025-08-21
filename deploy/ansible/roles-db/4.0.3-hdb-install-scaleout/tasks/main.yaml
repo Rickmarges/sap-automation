@@ -114,6 +114,8 @@
         force:                         true
       # Template parameter mapping
       vars:
+        _rsp_hana_data_basepath:       "{{ hana_data_basepath }}"
+        _rsp_hana_log_basepath:        "{{ hana_log_basepath }}"
         _rsp_component_root:           "../COMPONENTS"
         _rsp_components:               "{{ hana_components }}"
         _rsp_sapmnt:                   "/hana/shared"                              # Default Value
