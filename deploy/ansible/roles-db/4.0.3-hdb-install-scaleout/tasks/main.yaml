@@ -143,6 +143,17 @@
           {% endif %}
           {% endfor %}"
 
+    - name:                            "4.0.3 - SAP HANA SCALE OUT: Template processing: Create custom ini file {{ sap_custom_config }} from {{ HANA_2_00_customconfig.rsp }}"
+      ansible.builtin.template:
+        src:                           "HANA_2_00_customconfig.rsp"
+        dest:                          "{{ dir_params }}/{{ sap_custom_config }}"
+        mode:                          0644
+        force:                         true
+      vars:
+        _rsp_basepath_shared:          "no"
+        _rsp_hana_data_basepath:       "{{ hana_data_basepath }}"
+        _rsp_hana_log_basepath:        "{{ hana_log_basepath }}"
+
     - name:                            "4.0.3 - SAP HANA SCALE OUT: Progress"
       ansible.builtin.debug:
         msg:                           "Start HANA Installation on primary node"
@@ -153,7 +164,7 @@
           ansible.builtin.shell: |
                                        umask {{ custom_umask | default('022') }} ;
                                        chmod 755 /usr/sap;
-                                       ./hdblcm --batch --action=install --hostname {{ virtual_host | trim }} --configfile='{{ dir_params }}/{{ sap_inifile }}'
+                                       ./hdblcm --batch --action=install --hostname {{ virtual_host | trim }} --configfile='{{ dir_params }}/{{ sap_inifile }}' --custom_cfg='{{ dir_params }}'
           args:
             chdir:                     "{{ target_media_location }}/CD_HDBSERVER/SAP_HANA_DATABASE"
             creates:                   "/etc/sap_deployment_automation/{{ db_sid | upper }}/sap_deployment_hdb.txt"
