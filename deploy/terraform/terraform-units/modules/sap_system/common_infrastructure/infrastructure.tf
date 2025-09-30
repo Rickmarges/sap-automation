@@ -9,6 +9,10 @@
 #######################################4#######################################8
 
 resource "azurerm_resource_group" "resource_group" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.resource_group_exists ? 0 : 1
   name                                 = local.resourcegroup_name
@@ -45,6 +49,10 @@ data "azurerm_storage_account" "storage_bootdiag" {
 
 // PROXIMITY PLACEMENT GROUP
 resource "azurerm_proximity_placement_group" "ppg" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = (local.ppg_exists || var.use_scalesets_for_deployment || !local.create_ppg) ? (
                                            0) : ((
@@ -72,6 +80,10 @@ data "azurerm_proximity_placement_group" "ppg" {
 }
 
 resource "azurerm_proximity_placement_group" "app_ppg" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.infrastructure.use_app_proximityplacementgroups ? (
                                           (local.app_ppg_exists || var.use_scalesets_for_deployment ) ? (
@@ -104,6 +116,10 @@ data "azurerm_proximity_placement_group" "app_ppg" {
 //ASG
 
 resource "azurerm_application_security_group" "db" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.deploy_application_security_groups ? 1 : 0
   name                                 = format("%s%s%s%s",
@@ -146,6 +162,9 @@ data "template_cloudinit_config" "config_growpart" {
 
 
 resource "azurerm_orchestrated_virtual_machine_scale_set" "scale_set" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 
   provider                             = azurerm.main
   count                                = var.use_scalesets_for_deployment && length(var.scaleset_id) == 0 ? 1 : 0
@@ -185,6 +204,4 @@ data "azurerm_orchestrated_virtual_machine_scale_set" "scale_set" {
 
   name                                 = split("/", var.scaleset_id)[8]
   resource_group_name                  = split("/", var.scaleset_id)[4]
-                                                                    }
-
-
+}

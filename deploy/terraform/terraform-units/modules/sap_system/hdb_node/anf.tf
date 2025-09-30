@@ -8,6 +8,10 @@
 #######################################4#######################################8
 
 resource "azurerm_netapp_volume" "hanadata" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.create_data_volumes ? (var.database_server_count - var.database.stand_by_node_count) * var.hana_ANF_volumes.data_volume_count : 0
   name                                 = format("%s%s%s%s%d",
@@ -78,6 +82,10 @@ data "azurerm_netapp_volume" "hanadata" {
 
 
 resource "azurerm_netapp_volume" "hanalog" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   depends_on                           = [azurerm_netapp_volume_group_sap_hana.avg_HANA_full]
 
@@ -153,6 +161,10 @@ data "azurerm_netapp_volume" "hanalog" {
 }
 
 resource "azurerm_netapp_volume" "hanashared" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   depends_on                           = [azurerm_netapp_volume_group_sap_hana.avg_HANA_full]
 
@@ -238,4 +250,3 @@ data "azurerm_subnet" "ANF" {
   resource_group_name                  = split("/", local.ANF_pool_settings.subnet_id)[4]
   virtual_network_name                 = split("/", local.ANF_pool_settings.subnet_id)[8]
 }
-

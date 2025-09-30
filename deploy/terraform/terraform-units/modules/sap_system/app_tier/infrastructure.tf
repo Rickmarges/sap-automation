@@ -326,6 +326,10 @@ resource "azurerm_availability_set" "scs" {
 #                                                                              #
 #######################################4#######################################8
 resource "azurerm_availability_set" "app" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   # TODO: investigate the count. In a previous version (when this was based on PPG) we got 2, but in the new version we only get 1
   count                                = local.use_app_avset && var.application_tier.avset_arm_ids_count == 0 ? max(length(var.ppg), 1) : 0
@@ -359,6 +363,10 @@ resource "azurerm_availability_set" "app" {
 ##############################################################################################
 
 resource "azurerm_application_security_group" "app" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? (
                                             var.deploy_application_security_groups ? 1 : 0) : (
@@ -382,6 +390,10 @@ resource "azurerm_application_security_group" "app" {
 }
 
 resource "azurerm_application_security_group" "web" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? (
                                             var.deploy_application_security_groups ? 1 : 0) : (

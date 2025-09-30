@@ -3,6 +3,10 @@
 
 
 resource "azurerm_storage_account" "hanashared" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.NFS_provider == "AFS" && var.database.scale_out ? (
                                            try(length(var.hanashared_id) > 0, false) ? (
@@ -95,6 +99,10 @@ resource "azurerm_storage_share" "hanashared" {
 }
 
 resource "azurerm_private_endpoint" "hanashared" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.NFS_provider == "AFS" && var.use_private_endpoint && var.database.scale_out ? (
                                           length(try(var.hanashared_private_endpoint_id, "")) > 0 ? (

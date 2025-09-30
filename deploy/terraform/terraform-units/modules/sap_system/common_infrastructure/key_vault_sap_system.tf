@@ -37,6 +37,10 @@ data "azurerm_key_vault_secret" "sid_password" {
 #                                                                             #
 ###############################################################################
 resource "azurerm_key_vault" "sid_keyvault_user" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_sid_deployment && local.use_local_credentials && length(local.user_key_vault_id) == 0 ? 1 : 0
   name                                 = local.user_keyvault_name
@@ -105,6 +109,10 @@ resource "random_password" "password" {
 
 // Store the logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_username" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   content_type                         = "configuration"
@@ -116,6 +124,10 @@ resource "azurerm_key_vault_secret" "auth_username" {
 
 // Store the password in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   content_type                         = "secret"
@@ -137,6 +149,10 @@ resource "tls_private_key" "sdu" {
 
 // By default the SSH keys are stored in landscape key vault. By defining the authenticationb block the SDU keyvault
 resource "azurerm_key_vault_secret" "sdu_private_key" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   content_type                         = "secret"
@@ -147,6 +163,10 @@ resource "azurerm_key_vault_secret" "sdu_private_key" {
 }
 
 resource "azurerm_key_vault_secret" "sdu_public_key" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   content_type                         = "secret"

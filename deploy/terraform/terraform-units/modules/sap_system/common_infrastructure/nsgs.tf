@@ -9,6 +9,10 @@
 
 # Creates SAP db subnet nsg
 resource "azurerm_network_security_group" "db" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_db_deployment ? (local.database_subnet_nsg_exists ? 0 : 1) : 0
   name                                 = local.database_subnet_nsg_name
@@ -60,6 +64,10 @@ resource "azurerm_subnet_network_security_group_association" "db" {
 
 # Creates SAP admin subnet nsg
 resource "azurerm_network_security_group" "admin" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = !local.admin_subnet_nsg_exists && local.enable_admin_subnet ? 1 : 0
   name                                 = local.admin_subnet_nsg_name

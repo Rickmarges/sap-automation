@@ -9,6 +9,10 @@
 #                                                                              #
 #######################################4#######################################8
 resource "azurerm_network_interface" "observer" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.deploy_observer ? local.db_zone_count : 0
   name                                 = format("%s%s%s%s%s",
@@ -121,6 +125,12 @@ resource "azurerm_linux_virtual_machine" "observer" {
   boot_diagnostics {
                      storage_account_uri = var.storage_bootdiag_endpoint
                    }
+  lifecycle {
+    ignore_changes = [
+      source_image_id,
+      tags
+    ]
+  }
 
 }
 
@@ -191,7 +201,8 @@ resource "azurerm_windows_virtual_machine" "observer" {
                    }
   lifecycle {
     ignore_changes = [
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 }

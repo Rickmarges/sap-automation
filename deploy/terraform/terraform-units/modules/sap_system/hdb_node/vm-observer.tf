@@ -9,6 +9,10 @@
 #                                                                              #
 #######################################4#######################################8
 resource "azurerm_network_interface" "observer" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.use_observer ? 1 : 0
   name                                 = format("%s%s%s%s%s",
@@ -49,6 +53,10 @@ resource "azurerm_network_interface" "observer" {
 #######################################4#######################################8
 
 resource "azurerm_linux_virtual_machine" "observer" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.use_observer ? 1 : 0
   depends_on                           = [var.anchor_vm]

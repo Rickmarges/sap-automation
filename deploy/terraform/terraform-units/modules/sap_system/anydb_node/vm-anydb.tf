@@ -9,6 +9,10 @@
 #######################################4#######################################8
 
 resource "azurerm_network_interface" "anydb_db" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? var.database_server_count : 0
   name                                 = format("%s%s%s%s%s",
@@ -66,6 +70,10 @@ resource "azurerm_network_interface_application_security_group_association" "db"
 #                                                                              #
 #######################################4#######################################8
 resource "azurerm_network_interface" "anydb_admin" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && local.anydb_dual_nics ? (
                                           var.database_server_count) : (
@@ -244,7 +252,8 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     ignore_changes = [
       // Ignore changes to computername
       computer_name,
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 
@@ -381,7 +390,8 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
     ignore_changes = [
       // Ignore changes to computername
       computer_name,
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 }
@@ -433,7 +443,8 @@ resource "azurerm_managed_disk" "disks" {
     ignore_changes = [
       create_option,
       hyper_v_generation,
-      source_resource_id
+      source_resource_id,
+      tags
     ]
   }
 
@@ -458,6 +469,10 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm_disks" {
 
 # VM Extension
 resource "azurerm_virtual_machine_extension" "anydb_lnx_aem_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.database.deploy_v1_monitoring_extension ? (
                                            upper(local.anydb_ostype) == "LINUX" ? (
@@ -482,6 +497,10 @@ resource "azurerm_virtual_machine_extension" "anydb_lnx_aem_extension" {
 
 
 resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.database.deploy_v1_monitoring_extension ? (
                                            upper(local.anydb_ostype) == "WINDOWS" ? (
@@ -512,6 +531,10 @@ resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
 #######################################4#######################################8
 
 resource "azurerm_virtual_machine_extension" "configure_ansible" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? (
                                            upper(local.anydb_ostype) == "WINDOWS" ? (

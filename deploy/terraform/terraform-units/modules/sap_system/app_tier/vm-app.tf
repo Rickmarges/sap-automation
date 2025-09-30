@@ -9,6 +9,10 @@
 #######################################4#######################################8
 
 resource "azurerm_network_interface" "app" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? local.application_server_count : 0
   name                                 = format("%s%s%s%s%s",
@@ -65,6 +69,10 @@ resource "azurerm_network_interface_application_security_group_association" "app
 #######################################4#######################################8
 
 resource "azurerm_network_interface" "app_admin" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.application_tier.dual_nics && length(try(var.admin_subnet.id, "")) > 0 ? (
                                            local.application_server_count) : (
@@ -255,7 +263,8 @@ resource "azurerm_linux_virtual_machine" "app" {
     ignore_changes = [
       source_image_id,
       proximity_placement_group_id,
-      zone
+      zone,
+      tags
     ]
   }
 
@@ -398,7 +407,8 @@ resource "azurerm_windows_virtual_machine" "app" {
     ignore_changes = [
       // Ignore changes to computername
       source_image_id,
-      zone
+      zone,
+      tags
     ]
   }
 
@@ -434,10 +444,10 @@ resource "azurerm_managed_disk" "app" {
     ignore_changes = [
       create_option,
       hyper_v_generation,
-      source_resource_id
+      source_resource_id,
+      tags
     ]
   }
-
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
@@ -456,6 +466,10 @@ resource "azurerm_virtual_machine_data_disk_attachment" "app" {
 
 # VM Extension
 resource "azurerm_virtual_machine_extension" "app_lnx_aem_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.application_tier.deploy_v1_monitoring_extension && upper(var.application_tier.app_os.os_type) == "LINUX" ? (
                                            local.application_server_count) : (
@@ -477,6 +491,10 @@ resource "azurerm_virtual_machine_extension" "app_lnx_aem_extension" {
 
 
 resource "azurerm_virtual_machine_extension" "app_win_aem_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.application_tier.deploy_v1_monitoring_extension && upper(var.application_tier.app_os.os_type) == "WINDOWS" ? (
     local.application_server_count) : (
@@ -497,6 +515,10 @@ resource "azurerm_virtual_machine_extension" "app_win_aem_extension" {
 }
 
 resource "azurerm_virtual_machine_extension" "configure_ansible_app" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && upper(var.application_tier.app_os.os_type) == "WINDOWS" ? (
                                            local.application_server_count) : (

@@ -8,6 +8,10 @@
 #                                                                              #
 #######################################4#######################################8
 resource "azurerm_network_interface" "web" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? local.webdispatcher_count : 0
   name                                 = format("%s%s%s%s%s",
@@ -255,7 +259,8 @@ resource "azurerm_linux_virtual_machine" "web" {
                        }
   lifecycle {
     ignore_changes = [
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 
@@ -401,7 +406,8 @@ resource "azurerm_windows_virtual_machine" "web" {
                        }
   lifecycle {
     ignore_changes = [
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 
@@ -437,7 +443,8 @@ resource "azurerm_managed_disk" "web" {
     ignore_changes = [
       create_option,
       hyper_v_generation,
-      source_resource_id
+      source_resource_id,
+      tags
     ]
   }
 }
@@ -456,6 +463,10 @@ resource "azurerm_virtual_machine_data_disk_attachment" "web" {
 }
 
 resource "azurerm_virtual_machine_extension" "web_lnx_aem_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.application_tier.deploy_v1_monitoring_extension && upper(var.application_tier.web_os.os_type) == "LINUX" ? (
                                            local.webdispatcher_count) : (
@@ -477,6 +488,10 @@ resource "azurerm_virtual_machine_extension" "web_lnx_aem_extension" {
 
 
 resource "azurerm_virtual_machine_extension" "web_win_aem_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.application_tier.deploy_v1_monitoring_extension && upper(var.application_tier.web_os.os_type) == "WINDOWS" ? (
                                            local.webdispatcher_count) : (
@@ -497,6 +512,9 @@ resource "azurerm_virtual_machine_extension" "web_win_aem_extension" {
 }
 
 resource "azurerm_virtual_machine_extension" "configure_ansible_web" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 
   provider                             = azurerm.main
   count                                = local.enable_deployment && upper(var.application_tier.web_os.os_type) == "WINDOWS" ? (
@@ -529,6 +547,10 @@ resource "azurerm_virtual_machine_extension" "configure_ansible_web" {
 
 # Create the Web dispatcher Load Balancer
 resource "azurerm_lb" "web" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_web_lb_deployment ? 1 : 0
   name                                 = format("%s%s%s%s",
@@ -634,6 +656,10 @@ resource "azurerm_network_interface_backend_address_pool_association" "web" {
 ##############################################################################################
 
 resource "azurerm_availability_set" "web" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.use_web_avset ? max(length(local.web_zones), 1) : 0
   name                                 = format("%s%s%s",

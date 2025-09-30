@@ -3,6 +3,10 @@
 
 // AVAILABILITY SET
 resource "azurerm_availability_set" "hdb" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && local.use_avset && !local.availabilitysets_exist ? (
                                            max(length(local.zones), 1)) : (
@@ -43,6 +47,10 @@ Load balancer front IP address range: .4 - .9
 +--------------------------------------4--------------------------------------*/
 
 resource "azurerm_lb" "hdb" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_db_lb_deployment ? 1 : 0
   name                                 = format("%s%s%s%s",
@@ -137,6 +145,10 @@ resource "azurerm_lb_rule" "hdb" {
 }
 
 resource "azurerm_private_dns_a_record" "db" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.dnsmanagement
   count                                = local.enable_db_lb_deployment && length(local.dns_label) > 0 && var.dns_settings.register_virtual_network_to_dns ? 1 : 0
   name                                 = lower(format("%s%sdb%scl", var.sap_sid, local.database_sid, local.database_instance))
@@ -192,6 +204,10 @@ resource "azurerm_lb_rule" "hdb_active_active" {
 }
 
 resource "azurerm_private_dns_a_record" "db_active_active" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.dnsmanagement
   count                                = local.enable_db_lb_deployment && var.database_active_active && length(local.dns_label) > 0 && var.dns_settings.register_virtual_network_to_dns ? 1 : 0
   name                                 = lower(format("%s%sdb%sclr", var.sap_sid, local.database_sid, local.database_instance))

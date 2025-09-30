@@ -9,6 +9,10 @@
 #######################################4#######################################8
 
 resource "azurerm_storage_account" "sapmnt" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.NFS_provider == "AFS" ? (
                                            length(var.azure_files_sapmnt_id) > 0 ? (
@@ -81,6 +85,10 @@ data "azurerm_storage_account" "sapmnt" {
 }
 
 resource "azurerm_private_endpoint" "sapmnt" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.NFS_provider == "AFS" && var.use_private_endpoint ? (
                                           length(var.sapmnt_private_endpoint_id) > 0 ? (

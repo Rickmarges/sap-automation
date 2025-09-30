@@ -9,6 +9,10 @@
 #######################################4#######################################8
 
 resource "azurerm_lb" "anydb" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_db_lb_deployment ? 1 : 0
   name                                 = format("%s%s%s%s",
@@ -116,6 +120,10 @@ resource "azurerm_network_interface_backend_address_pool_association" "anydb" {
 #######################################4#######################################8
 
 resource "azurerm_availability_set" "anydb" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && !var.use_scalesets_for_deployment  ? (
                                             var.database.use_avset && !local.availabilitysets_exist ? max(length(local.zones), 1) : 0) : (
@@ -155,6 +163,10 @@ data "azurerm_availability_set" "anydb" {
 #######################################4#######################################8
 
 resource "azurerm_private_dns_a_record" "db" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.dnsmanagement
   count                                = local.enable_db_lb_deployment && length(local.dns_label) > 0 && var.dns_settings.register_virtual_network_to_dns ? 1 : 0
   name                                 = lower(format("%s%sdb%scl", var.sap_sid, local.anydb_sid, "00"))

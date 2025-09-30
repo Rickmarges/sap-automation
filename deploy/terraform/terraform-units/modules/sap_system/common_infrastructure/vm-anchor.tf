@@ -123,7 +123,8 @@ resource "azurerm_linux_virtual_machine" "anchor" {
 
   lifecycle {
     ignore_changes = [
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 
@@ -197,7 +198,8 @@ resource "azurerm_windows_virtual_machine" "anchor" {
 
   lifecycle {
     ignore_changes = [
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 

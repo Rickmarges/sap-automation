@@ -21,6 +21,10 @@ HANA DB Linux Server private IP range: .10 -
 #########################################################################################
 
 resource "azurerm_network_interface" "nics_dbnodes_admin" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.database_dual_nics && length(try(var.admin_subnet.id, "")) > 0 ? (
                                            var.database_server_count) : (
@@ -65,6 +69,10 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
 #                                                                                       #
 #########################################################################################
 resource "azurerm_network_interface" "nics_dbnodes_db" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment ? var.database_server_count : 0
   name                                 = format("%s%s%s%s%s",
@@ -121,6 +129,10 @@ resource "azurerm_network_interface_application_security_group_association" "db"
 #########################################################################################
 
 resource "azurerm_network_interface" "nics_dbnodes_storage" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && try(var.landscape_tfstate.use_separate_storage_subnet, local.enable_storage_subnet) && var.enable_storage_nic ? (
                                             var.database_server_count
@@ -309,7 +321,8 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
                      }
   lifecycle {
     ignore_changes = [
-      source_image_id
+      source_image_id,
+      tags
     ]
   }
 
@@ -384,7 +397,8 @@ resource "azurerm_managed_disk" "data_disk" {
     ignore_changes = [
       create_option,
       hyper_v_generation,
-      source_resource_id
+      source_resource_id,
+      tags
     ]
   }
 
@@ -403,6 +417,10 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm_dbnode_data_disk" {
 
 # VM Extension
 resource "azurerm_virtual_machine_extension" "hdb_linux_extension" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = local.enable_deployment && var.database.deploy_v1_monitoring_extension ? var.database_server_count : 0
   name                                 = "MonitorX64Linux"

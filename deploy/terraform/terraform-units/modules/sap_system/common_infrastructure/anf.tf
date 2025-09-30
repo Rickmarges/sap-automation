@@ -8,6 +8,10 @@
 #######################################4#######################################8
 
 resource "azurerm_netapp_volume" "sapmnt" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.NFS_provider == "ANF" ? (
                                            var.hana_ANF_volumes.use_existing_sapmnt_volume ? (
@@ -55,10 +59,13 @@ resource "azurerm_netapp_volume" "sapmnt" {
   zone                                 = length(local.scs_zones) > 0  && var.hana_ANF_volumes.use_zones ? try(local.scs_zones[0], null) : null
 
   tags                                 = var.tags
-
 }
 
 resource "azurerm_netapp_volume" "sapmnt_secondary" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.NFS_provider == "ANF" ? (
                                            var.hana_ANF_volumes.sapmnt_use_clone_in_secondary_zone ? (
@@ -124,12 +131,15 @@ data "azurerm_netapp_volume" "sapmnt" {
   account_name                         = local.ANF_pool_settings.account_name
   pool_name                            = local.ANF_pool_settings.pool_name
   name                                 = var.hana_ANF_volumes.sapmnt_volume_name
-
 }
 
 
 
 resource "azurerm_netapp_volume" "usrsap" {
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
+
   provider                             = azurerm.main
   count                                = var.hana_ANF_volumes.use_for_usr_sap ? (
                                           var.hana_ANF_volumes.use_existing_usr_sap_volume ? (
