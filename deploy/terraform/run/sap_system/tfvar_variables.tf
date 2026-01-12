@@ -150,6 +150,12 @@ variable "enable_firewall_for_keyvaults_and_storage" {
                                                        type        = bool
                                                      }
 
+variable "public_network_access_enabled"        {
+                                                  description = "Boolean value indicating if public network access should be enabled for storage accounts (AFS shares like sid-share, hanashared). If not specified, the landscape setting will be used."
+                                                  default     = null
+                                                  type        = bool
+                                                }
+
 variable "encryption_at_host_enabled"           {
                                                   description = "Enables host encryption for sap vms"
                                                   default     = false

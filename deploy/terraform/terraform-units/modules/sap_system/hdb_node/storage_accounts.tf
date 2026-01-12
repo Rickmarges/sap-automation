@@ -45,6 +45,11 @@ resource "azurerm_storage_account" "hanashared" {
   shared_access_key_enabled            = var.infrastructure.shared_access_key_enabled_nfs
   tags                                 = var.tags
 
+  public_network_access_enabled        = var.public_network_access_enabled != null ? (
+                                         var.public_network_access_enabled) : (
+                                         try(var.landscape_tfstate.public_network_access_enabled, true)
+                                       )
+
   network_rules {
                   default_action       = var.enable_firewall_for_keyvaults_and_storage ? "Deny" : "Allow"
                   bypass               = ["Metrics", "Logging", "AzureServices"]

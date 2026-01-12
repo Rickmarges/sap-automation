@@ -96,6 +96,7 @@ module "common_infrastructure" {
   use_scalesets_for_deployment                  = var.use_scalesets_for_deployment
   dns_settings                                  = local.dns_settings
   enable_firewall_for_keyvaults_and_storage     = var.enable_firewall_for_keyvaults_and_storage
+  public_network_access_enabled                 = var.public_network_access_enabled
 
 }
 
@@ -142,6 +143,7 @@ module "hdb_node" {
   deployment                                    = var.deployment
   dns_settings                                  = local.dns_settings
   enable_firewall_for_keyvaults_and_storage     = var.enable_firewall_for_keyvaults_and_storage
+  public_network_access_enabled                 = var.public_network_access_enabled
   fencing_role_name                             = var.fencing_role_name
   hana_ANF_volumes                              = local.hana_ANF_volumes
   hanashared_id                                 = length(var.hanashared_id) > 0 ? (length(var.hanashared_id[0]) > 0 ? var.hanashared_id : []) : []

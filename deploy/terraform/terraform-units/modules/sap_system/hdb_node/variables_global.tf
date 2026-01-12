@@ -84,6 +84,12 @@ variable "enable_firewall_for_keyvaults_and_storage"    {
                                                           description = "Boolean value indicating if firewall should be enabled for key vaults and storage"
                                                           type        = bool
                                                         }
+
+variable "public_network_access_enabled"              {
+                                                          description = "Boolean value indicating if public network access should be enabled for storage accounts (AFS shares). If not specified, the landscape setting will be used."
+                                                          default     = null
+                                                          type        = bool
+                                                        }
 #########################################################################################
 #                                                                                       #
 #  DNS settings                                                                         #
