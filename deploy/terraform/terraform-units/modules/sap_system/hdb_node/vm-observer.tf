@@ -54,7 +54,10 @@ resource "azurerm_network_interface" "observer" {
 
 resource "azurerm_linux_virtual_machine" "observer" {
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [
+      tags,
+      source_image_id
+    ]
   }
 
   provider                             = azurerm.main
