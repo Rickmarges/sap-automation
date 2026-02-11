@@ -8,9 +8,11 @@
 # Ref: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability
 # Ref: https://learn.microsoft.com/en-us/azure/sap/workloads/sap-hana-high-availability-netapp-files-suse#create-file-system-resources
 
+# Additional mount options (e.g. nodev,nosuid) are derived from afs_mnt_options
+# by computing the difference against afs_mnt_options_default and appending them.
 - name:                            "5.8 HANA Pacemaker Scaleout - NFS Compatibility - set mount options based on NFS source"
   ansible.builtin.set_fact:
-    nfs_mount_options:             "{% if NFS_provider == 'ANF' %}bind,defaults,rw,hard,rsize=262144,wsize=262144,proto=tcp,noatime,_netdev,nfsvers=4.1,lock,sec=sys{% else %}bind,defaults,rw,hard,proto=tcp,noatime,nfsvers=4.1,lock{% endif %}"
+    nfs_mount_options:             "{% if NFS_provider == 'ANF' %}bind,defaults,rw,hard,rsize=262144,wsize=262144,proto=tcp,noatime,_netdev,nfsvers=4.1,lock,sec=sys{% else %}bind,defaults,rw,hard,proto=tcp,noatime,nfsvers=4.1,lock{% set extras = afs_mnt_options.split(',') | difference(afs_mnt_options_default.split(',')) %}{% if extras %},{{ extras | join(',') }}{% endif %}{% endif %}"
 
 - name:                            "5.8 HANA Pacemaker Scaleout - Scale-Out Cluster Compatibility - Fetch majority maker node name"
   ansible.builtin.set_fact:

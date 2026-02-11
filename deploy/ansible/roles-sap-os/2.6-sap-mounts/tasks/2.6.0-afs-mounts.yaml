@@ -31,9 +31,17 @@
     - "{{ query('inventory_hostnames', '{{ sap_sid | upper }}_SCS') }}"
     - "{{ query('inventory_hostnames', '{{ sap_sid | upper }}_DB') }}"
 
+# The afs_mnt_options_default captures the baseline AFS mount options.
+# If afs_mnt_options has been pre-set (e.g. with additional hardening options),
+# it will be preserved. This allows consumers to extend mount options while
+# keeping the baseline available for computing deltas downstream.
+- name:                                "AFS Mount: Set the AFS mount options baseline"
+  ansible.builtin.set_fact:
+    afs_mnt_options_default:           'noresvport,vers=4,minorversion=1,sec=sys'
+
 - name:                                "AFS Mount: Set the NFSmount options"
   ansible.builtin.set_fact:
-    afs_mnt_options:                   'noresvport,vers=4,minorversion=1,sec=sys'
+    afs_mnt_options:                   "{{ afs_mnt_options | default(afs_mnt_options_default) }}"
 
 - name:                                "AFS Mount: Create list of all_sap_mounts to support"
   ansible.builtin.debug:
@@ -427,7 +435,7 @@
       'type':              'shared',
       'temppath':          'shared',
       'mount':             "{% if site | default('SITE1') == 'SITE1' %}{{ hana_shared_mountpoint[0] }}{% else %}{{ hana_shared_mountpoint[1] }}{% endif %}",
-      'opts':              'vers=4,minorversion=1,sec=sys',
+      'opts':              '{{ afs_mnt_options }}',
       'path':              '/hana/shared',
       'owner':             '{{ sidadm_uid }}',
       'permissions':       '0775',
@@ -450,7 +458,7 @@
       'type':              'shared',
       'temppath':          'shared',
       'mount':             "{{ hana_shared_mountpoint[0] }}",
-      'opts':              'vers=4,minorversion=1,sec=sys',
+      'opts':              '{{ afs_mnt_options }}',
       'path':              '/hana/shared',
       'owner':             '{{ sidadm_uid }}',
       'permissions':       '0775',
