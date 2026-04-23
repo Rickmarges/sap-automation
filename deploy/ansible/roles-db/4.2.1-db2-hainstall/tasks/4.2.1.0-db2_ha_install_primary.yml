@@ -23,7 +23,7 @@
     - name:                            "SAP DB2 Install: Set BOM facts"
       ansible.builtin.set_fact:
         sap_inifile:                   "{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params"
-        sap_inifile_template:          "dbload-inifile-param.j2"
+        sap_inifile_template:          "{{ (bom_base_name ~ bom_suffix ~ '-dbload-inifile-param.j2') if (use_remote_ini_files_from_bom | default(false)) else 'dbload-inifile-param.j2' }}"
         dir_params:                    "{{ tmp_directory }}/.{{ sap_sid | upper }}-params"
         mem_size:                      "{{ ansible_facts.memory_mb.real.total | int * 0.8 }}"
 
@@ -81,6 +81,30 @@
           - "INIFILE:    {{ sap_inifile }}"
           - "mem_size:   {{ mem_size | int }}"
 
+    - name:                            "DB2 Install: Include roles-sap/3.3.1-bom-utility role"
+      ansible.builtin.include_role:
+        name:                          roles-sap/3.3.1-bom-utility
+        tasks_from:                    bom-template
+      vars:
+        bom_name:                      "{{ bom_base_name }}"
+        task_prefix:                   "DB2 Install: "
+        db2_archive_path:              "{{ target_media_location }}/sapdb2_software"
+        db2_cd_package_exportcd:       "{{ target_media_location }}/CD_EXPORT/DATA_UNITS"
+        db2_cd_package_db2client:      "{{ db2_archive_path }}/db2client"
+        db2_cd_package_software:       "{{ db2_archive_path }}/db2server/LINUXX86_64"
+        db2_cd_package_kernel:         "{{ target_media_location }}/download_basket/"
+        sap_db_hostname:               "{{ virtual_host }}"
+        db2_encryption_algo_type:      "AES"
+        db2_ase_encryption_length:     "256"
+        db2_encryption_keystore_dir:   /db2/db2{{ db_sid | lower }}/keystore
+        db2_sslencryption_label:       "sap_db2{{ db_sid }}_{{ virtual_host }}_ssl_comm_000"
+        sap_scs_hostname:              "{{ custom_scs_virtual_hostname | default(hostvars[query('inventory_hostnames', '{{ sap_sid | upper }}_SCS') | first]['virtual_host'], true) }}"
+        sap_profile_dir:               "/sapmnt/{{ sap_sid | upper }}/profile"
+        param_directory:               "{{ dir_params }}"
+        db2_memory:                    "{{ mem_size | int }}"
+        always_upload_jinja_templates: false
+      when:                            use_remote_ini_files_from_bom | default(false)
+
     - name:                            "DB2 Install: Template processing: Create ini file {{ sap_inifile }} from {{ sap_inifile_template }}"
       ansible.builtin.template:
         src:                           "{{ sap_inifile_template }}"
@@ -103,6 +127,7 @@
         param_directory:               "{{ dir_params }}"
         db2_memory:                    "{{ mem_size | int }}"
         always_upload_jinja_templates: false
+      when:                            not (use_remote_ini_files_from_bom | default(false))
 
     - name:                            "SAP DB2 install: variables"
       ansible.builtin.debug:
